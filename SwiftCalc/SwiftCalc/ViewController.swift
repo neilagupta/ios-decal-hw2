@@ -18,10 +18,12 @@ class ViewController: UIViewController {
     //            We will be using the result label to run autograded tests.
     // MARK: The label to display our calculations
     var resultLabel = UILabel()
+    var lastResult : String?
     
     // TODO: This looks like a good place to add some data structures.
     //       One data structure is initialized below for reference.
-    var someDataStructure: [String] = [""]
+    var resultStringData: [String] = [""]
+    var operationStringData: [String] = [""]
     
 
     override func viewDidLoad() {
@@ -66,6 +68,22 @@ class ViewController: UIViewController {
     //       Modify this one or create your own.
     func intCalculate(a: Int, b:Int, operation: String) -> Int {
         print("Calculation requested for \(a) \(operation) \(b)")
+        let aInt : Int = Int(a)
+        let bInt : Int = Int(b)
+        
+        if (operation == "+") {
+            return aInt + bInt
+        } else if (operation == "-") {
+            return aInt - bInt
+        } else if (operation == "/") {
+            if (bInt == 0) {
+                //TODO: Do alert
+            }
+            return aInt / bInt
+        } else if (operation == "*") {
+            return aInt * bInt
+        }
+        
         return 0
     }
     
@@ -73,6 +91,22 @@ class ViewController: UIViewController {
     //       Modify this one or create your own.
     func calculate(a: String, b:String, operation: String) -> Double {
         print("Calculation requested for \(a) \(operation) \(b)")
+        let aDbl : Double = Double(a)!
+        let bDbl : Double = Double(b)!
+        
+        if (operation == "+") {
+            return aDbl + bDbl
+        } else if (operation == "-") {
+            return aDbl - bDbl
+        } else if (operation == "/") {
+            if (bDbl == 0.0) {
+                //TODO: Do alert
+            }
+            return aDbl / bDbl
+        } else if (operation == "*") {
+            return aDbl * bDbl
+        }
+        
         return 0.0
     }
     
@@ -80,17 +114,71 @@ class ViewController: UIViewController {
     func numberPressed(_ sender: CustomButton) {
         guard Int(sender.content) != nil else { return }
         print("The number \(sender.content) was pressed")
-        // Fill me in!
+        
+        //Checks if number is possible to add to the display
+        if (resultStringData.count < 8) {
+            resultStringData.append(sender.content)
+            if (resultLabel.text == "0") {
+                //Changes 0 to another number
+                resultLabel.text = sender.content
+            } else {
+                //Adds the number to the end
+                resultLabel.text!.append(sender.content)
+            }
+        }
+        // TODO: Fill me in!
     }
     
     // REQUIRED: The responder to an operator button being pressed.
     func operatorPressed(_ sender: CustomButton) {
         // Fill me in!
+        if (sender.content == "C") {
+            //Clears life
+            clear(cPressed: true)
+        }
+        
+        if (resultStringData.count < 7) {
+            if (sender.content == "+/-") {
+//                if (resultLabel.text!.contains("-") == true) {
+//                    resultLabel.text!.remove(at: 0)
+//                    resultStringData.remove(at: 0)
+//                } else {
+//                    resultStringData.insert("-", at: 0)
+//                    resultLabel.text!.insert("-", at: 0)
+//                }
+            }
+        }
+        
+        if (sender.content == "+") {
+            //Cal
+        }
+        
     }
     
     // REQUIRED: The responder to a number or operator button being pressed.
     func buttonPressed(_ sender: CustomButton) {
        // Fill me in!
+        if (sender.content == "0") {
+            if (resultLabel.text != "0") {
+                //adds 0 to end of number
+                resultLabel.text!.append(sender.content)
+            }
+        } else if (sender.content == ".") {
+            if ((resultLabel.text!.contains(".") == false) && (resultStringData.count < 8)) {
+                resultLabel.text!.append(".")
+                resultStringData.append(".")
+            }
+        }
+    }
+    
+    //Clears everything, should be only called when C is pressed
+    func clear(cPressed: Bool) {
+        resultStringData = [""]
+        operationStringData = [""]
+        if (cPressed) {
+            resultLabel.text = "0"
+        }
+        
     }
     
     // IMPORTANT: Do NOT change any of the code below.
