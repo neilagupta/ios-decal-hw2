@@ -19,10 +19,15 @@ class ViewController: UIViewController {
     // MARK: The label to display our calculations
     var resultLabel = UILabel()
     var lastResult : String?
+    var operatorLastPressed: Bool = false
     
     // TODO: This looks like a good place to add some data structures.
     //       One data structure is initialized below for reference.
+    
+    //Array version of resultStringLabel
     var resultStringData: [String] = [""]
+    
+    //Array version of the last operation
     var operationStringData: [String] = [""]
     
 
@@ -55,6 +60,7 @@ class ViewController: UIViewController {
     //       Modify this one or create your own.
     func updateResultLabel(_ content: String) {
         print("Update me like one of those PCs")
+        resultLabel.text = content
     }
     
     
@@ -115,18 +121,22 @@ class ViewController: UIViewController {
         guard Int(sender.content) != nil else { return }
         print("The number \(sender.content) was pressed")
         
-        //Checks if number is possible to add to the display
-        if (resultStringData.count < 8) {
+        if (operatorLastPressed == true) {
+            //If the last button pressed was an operator, then the next number should be a restart
+            operatorLastPressed = false
+            resultStringData.append(sender.content)
+            updateResultLabel(sender.content)
+        } else if (resultStringData.count < 8) {
+            //Checks if number is possible to add to the display
             resultStringData.append(sender.content)
             if (resultLabel.text == "0") {
-                //Changes 0 to another number
-                resultLabel.text = sender.content
+                //Resets text to another number
+                updateResultLabel(sender.content)
             } else {
                 //Adds the number to the end
                 resultLabel.text!.append(sender.content)
             }
         }
-        // TODO: Fill me in!
     }
     
     // REQUIRED: The responder to an operator button being pressed.
@@ -149,10 +159,48 @@ class ViewController: UIViewController {
             }
         }
         
-        if (sender.content == "+") {
-            //Cal
+        if (sender.content == "+" || sender.content == "-" || sender.content == "/" ||
+            sender.content == "*" || sender.content == "=") {
+            print("Operator pressed: " +  sender.content)
+            operating(operatorValue: sender.content)
         }
         
+    }
+    
+    func operating(operatorValue: String) {
+        if (operationStringData.contains("+") == true || operationStringData.contains("-") == true ||
+            operationStringData.contains("/") == true || operationStringData.contains("*") == true) {
+            let num1 : Int!
+            let num2 : Int!
+                
+            //num1 should have been saved in the last item
+            num1 = Int(operationStringData[0..<operationStringData.count - 1].joined())!
+            num2 = Int(resultLabel.text!)!
+                
+            let finalInt = intCalculate(a: num1, b: num2, operation: operationStringData[operationStringData.count - 1])
+                
+            
+            lastResult = (String(finalInt))
+            updateResultLabel(lastResult!)
+            
+            if (operatorValue == "=") {
+                operationStringData = [""]
+            } else {
+                operationStringData = lastResult!.components(separatedBy: "")
+                operationStringData.append(operatorValue)
+            }
+            
+            operatorLastPressed = true
+            
+        } else {
+            if (operatorValue != "=") {
+                //Adds the last number and operator to operationStringData
+                operationStringData += resultStringData
+                operationStringData.append(operatorValue)
+                operatorLastPressed = true
+            }
+            
+        }
     }
     
     // REQUIRED: The responder to a number or operator button being pressed.
@@ -171,7 +219,7 @@ class ViewController: UIViewController {
         }
     }
     
-    //Clears everything, should be only called when C is pressed
+    //Clears everything, should make resultLabel cleared when C is pressed
     func clear(cPressed: Bool) {
         resultStringData = [""]
         operationStringData = [""]
