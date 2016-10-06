@@ -122,6 +122,10 @@ class ViewController: UIViewController {
     func numberPressed(_ sender: CustomButton) {
         guard Int(sender.content) != nil else { return }
         print("The number \(sender.content) was pressed")
+        computeFromNumPressed(number: sender.content)
+    }
+    
+    func computeFromNumPressed(number: String) {
         if (computationOccurred == true) {
             computationOccurred = false
             clear(cPressed: true)
@@ -129,17 +133,17 @@ class ViewController: UIViewController {
         if (operatorLastPressed == true) {
             //If the last button pressed was an operator, then the next number should be a restart
             operatorLastPressed = false
-            resultStringData.append(sender.content)
-            updateResultLabel(sender.content)
+            resultStringData.append(number)
+            updateResultLabel(number)
         } else if (resultStringData.count < 8) {
             //Checks if number is possible to add to the display
-            resultStringData.append(sender.content)
+            resultStringData.append(number)
             if (resultLabel.text == "0") {
                 //Resets text to another number
-                updateResultLabel(sender.content)
+                updateResultLabel(number)
             } else {
                 //Adds the number to the end
-                resultLabel.text!.append(sender.content)
+                resultLabel.text!.append(number)
             }
         }
     }
@@ -222,11 +226,10 @@ class ViewController: UIViewController {
     func buttonPressed(_ sender: CustomButton) {
        // Fill me in!
         if (sender.content == "0") {
-            if (resultLabel.text != "0") {
-                //adds 0 to end of number
-                resultLabel.text!.append(sender.content)
-            }
-        } else if (sender.content == ".") {
+            computeFromNumPressed(number: sender.content)
+        }
+        
+        if (sender.content == ".") {
             if ((resultLabel.text!.contains(".") == false) && (resultStringData.count < 8)) {
                 if (computationOccurred == true) {
                     computationOccurred = false
@@ -248,6 +251,8 @@ class ViewController: UIViewController {
     func clear(cPressed: Bool) {
         resultStringData = [""]
         operationStringData = [""]
+        operatorLastPressed = false
+        computationOccurred = false
         if (cPressed) {
             resultLabel.text = "0"
         }
