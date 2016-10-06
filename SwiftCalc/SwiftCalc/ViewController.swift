@@ -20,6 +20,7 @@ class ViewController: UIViewController {
     var resultLabel = UILabel()
     var lastResult : String?
     var operatorLastPressed: Bool = false
+    var computationOccurred: Bool = false
     
     // TODO: This looks like a good place to add some data structures.
     //       One data structure is initialized below for reference.
@@ -120,7 +121,10 @@ class ViewController: UIViewController {
     func numberPressed(_ sender: CustomButton) {
         guard Int(sender.content) != nil else { return }
         print("The number \(sender.content) was pressed")
-        
+        if (computationOccurred == true) {
+            computationOccurred = false
+            clear(cPressed: true)
+        }
         if (operatorLastPressed == true) {
             //If the last button pressed was an operator, then the next number should be a restart
             operatorLastPressed = false
@@ -147,6 +151,7 @@ class ViewController: UIViewController {
             clear(cPressed: true)
         }
         
+        
         if (resultStringData.count < 7) {
             if (sender.content == "+/-") {
 //                if (resultLabel.text!.contains("-") == true) {
@@ -170,21 +175,22 @@ class ViewController: UIViewController {
     func operating(operatorValue: String) {
         if (operationStringData.contains("+") == true || operationStringData.contains("-") == true ||
             operationStringData.contains("/") == true || operationStringData.contains("*") == true) {
-            let num1 : Int!
-            let num2 : Int!
-                
+            let num1 : String!
+            let num2 : String!
+            
             //num1 should have been saved in the last item
-            num1 = Int(operationStringData[0..<operationStringData.count - 1].joined())!
-            num2 = Int(resultLabel.text!)!
+            num1 = operationStringData[0..<operationStringData.count - 1].joined()
+            num2 = resultLabel.text!
                 
-            let finalInt = intCalculate(a: num1, b: num2, operation: operationStringData[operationStringData.count - 1])
+            let finalValue = calculate(a: num1, b: num2, operation: operationStringData[operationStringData.count - 1])
                 
             
-            lastResult = (String(finalInt))
-            updateResultLabel(lastResult!)
+            lastResult = (String(finalValue))
+            updateResultLabel(String(format: finalValue == floor(finalValue) ? "%.0f" : "%.1f", finalValue))
             
             if (operatorValue == "=") {
                 operationStringData = [""]
+                computationOccurred = true
             } else {
                 operationStringData = lastResult!.components(separatedBy: "")
                 operationStringData.append(operatorValue)
@@ -195,9 +201,14 @@ class ViewController: UIViewController {
         } else {
             if (operatorValue != "=") {
                 //Adds the last number and operator to operationStringData
+                if (computationOccurred == true) {
+                    //If there was a computation last time, just modify that last computation
+                    resultStringData = resultLabel.text!.components(separatedBy: "")
+                }
                 operationStringData += resultStringData
                 operationStringData.append(operatorValue)
                 operatorLastPressed = true
+                computationOccurred = false
             }
             
         }
@@ -213,8 +224,18 @@ class ViewController: UIViewController {
             }
         } else if (sender.content == ".") {
             if ((resultLabel.text!.contains(".") == false) && (resultStringData.count < 8)) {
+                if (computationOccurred == true) {
+                    computationOccurred = false
+                    clear(cPressed: true)
+                }
+                if (operatorLastPressed == true) {
+                    //If the last button pressed was an operator
+                    operatorLastPressed = false
+                    
+                }
                 resultLabel.text!.append(".")
                 resultStringData.append(".")
+                
             }
         }
     }
