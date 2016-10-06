@@ -108,6 +108,7 @@ class ViewController: UIViewController {
         } else if (operation == "/") {
             if (bDbl == 0.0) {
                 //TODO: Do alert
+                
             }
             return aDbl / bDbl
         } else if (operation == "*") {
@@ -154,13 +155,9 @@ class ViewController: UIViewController {
         
         if (resultStringData.count < 7) {
             if (sender.content == "+/-") {
-//                if (resultLabel.text!.contains("-") == true) {
-//                    resultLabel.text!.remove(at: 0)
-//                    resultStringData.remove(at: 0)
-//                } else {
-//                    resultStringData.insert("-", at: 0)
-//                    resultLabel.text!.insert("-", at: 0)
-//                }
+                var resultValue : Double = Double(resultLabel.text!)!
+                resultValue = -resultValue
+                updateResultLabel(String(format: resultValue == floor(resultValue) ? "%.0f" : "%.1f", resultValue))
             }
         }
         
@@ -173,10 +170,17 @@ class ViewController: UIViewController {
     }
     
     func operating(operatorValue: String) {
+        
         if (operationStringData.contains("+") == true || operationStringData.contains("-") == true ||
             operationStringData.contains("/") == true || operationStringData.contains("*") == true) {
             let num1 : String!
             let num2 : String!
+            
+            if (operatorLastPressed == true) {
+                //If no new number has been inputted but the operator has been changed, then shift operators to the new one
+                operationStringData[operationStringData.count - 1] = operatorValue
+                return
+            }
             
             //num1 should have been saved in the last item
             num1 = operationStringData[0..<operationStringData.count - 1].joined()
