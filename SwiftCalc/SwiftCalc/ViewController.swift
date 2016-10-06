@@ -161,7 +161,14 @@ class ViewController: UIViewController {
             if (sender.content == "+/-") {
                 var resultValue : Double = Double(resultLabel.text!)!
                 resultValue = -resultValue
-                updateResultLabel(String(format: resultValue == floor(resultValue) ? "%.0f" : "%.1f", resultValue))
+                
+                if (resultValue.truncatingRemainder(dividingBy: floor(resultValue)) == 0) {
+                    //Floors decimal into int if its a flat value
+                    updateResultLabel(String(Int(resultValue)))
+                } else {
+                    updateResultLabel(String(resultValue))
+                }
+                resultStringData = resultLabel.text!.components(separatedBy: "")
             }
         }
         
@@ -191,10 +198,20 @@ class ViewController: UIViewController {
             num2 = resultLabel.text!
                 
             let finalValue = calculate(a: num1, b: num2, operation: operationStringData[operationStringData.count - 1])
-                
             
-            lastResult = (String(finalValue))
-            updateResultLabel(String(format: finalValue == floor(finalValue) ? "%.0f" : "%.1f", finalValue))
+            if (finalValue.truncatingRemainder(dividingBy: floor(finalValue)) == 0) {
+                //Floors decimal into int if its a flat value
+                lastResult = String(Int(finalValue))
+                print(Int(finalValue))
+            } else {
+                lastResult = (String(finalValue))
+                if (lastResult!.characters.count > 7) {
+                    //Cancel the entire operation if the string is greater than 7 digits
+                    clear(cPressed: true)
+                    return
+                }
+            }
+            updateResultLabel(lastResult!)
             
             if (operatorValue == "=") {
                 operationStringData = [""]
@@ -215,6 +232,7 @@ class ViewController: UIViewController {
                 }
                 operationStringData += resultStringData
                 operationStringData.append(operatorValue)
+                resultStringData = [""]
                 operatorLastPressed = true
                 computationOccurred = false
             }
